@@ -4,3 +4,6 @@
 # Ada Library Information
 *.ali
 .env
+
+
+node_modules
