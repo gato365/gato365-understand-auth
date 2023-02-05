@@ -60,7 +60,11 @@ userRouter.post('/login', async (req, res) => {
         return;
     }
 
-    if (user.password !== password) {
+//
+    const passwordValid = becrypt.compareSync(password, user.password);
+
+
+    if ( !passwordValid) {
         res.status(403).json({ message: 'Incorrect username or password, please try again' });
         return;
     }
