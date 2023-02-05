@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-
+const cookieParser = require("cookie-parser");
 const sequelize = require("./config/connection");
 const userRouter = require("./controllers/userApis");
 
@@ -14,8 +14,9 @@ app.use(express.json());
 // This line is needed to parse the body of the request
 app.use(express.urlencoded({ extended: true }));
 app.use("/user", userRouter);
+app.use(cookieParser());
 
-sequelize.sync( ).then(() => {
+sequelize.sync().then(() => {
     app.listen(PORT, () => 
     {
         console.log(`App listening on port ${PORT}!`);
