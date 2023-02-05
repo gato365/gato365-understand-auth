@@ -44,20 +44,36 @@ userRouter.post('/login', async (req, res) => {
 
     // This is the cookie we will be sending to the client
     res.cookie(
-        'session_token', 
-        token, 
-        { 
-            maxAge: 60 * 60 * 2 * 1000 
+        'session_token',
+        token,
+        {
+            maxAge: 60 * 60 * 2 * 1000
         });
-    
-    
-    
+
+
+
     res.status(200).end();
 
 });
 
 userRouter.get('/me', async (req, res) => {
     console.log(req.cookies);
+
+    const { session_token } = req.cookies;
+
+    try {
+        const userData = jwt.verify(session_token, process.env.JWT_KEY);
+        console.log(userData);
+        
+        const user = await User.findByPk(userData.id);
+        const userSimple = user.get({ plain: true });
+
+    } catch (err) {
+        res.status(403).json({ message: 'Bad Login' });
+        return;
+    }
+
+
 });
 
 module.exports = userRouter;
