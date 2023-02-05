@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
-const becrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 
 const userRouter = Router();
@@ -29,12 +29,9 @@ userRouter.post('/', async (req, res) => {
 
 
 
-    const encryptedPassword = await becrypt.hash(password, 10);
-
-
     const newUser = await User.create({
         username,
-        password: encryptedPassword,
+        password
     });
 
     res.status(200).json(
@@ -61,7 +58,7 @@ userRouter.post('/login', async (req, res) => {
     }
 
 //
-    const passwordValid = becrypt.compareSync(password, user.password);
+    const passwordValid = bcrypt.compareSync(password, user.password);
 
 
     if ( !passwordValid) {
@@ -105,6 +102,44 @@ userRouter.get('/me', async (req, res) => {
     // console.log(req.cookies);
 
     const { session_token } = req.cookies;
+
+    try {
+        const userData = jwt.verify(session_token, process.env.JWT_KEY);
+        console.log(userData);
+        
+        const user = await User.findByPk(userData.id);
+        const userSimple = user.get({ plain: true });
+        delete userSimple.password;
+
+        res.json(userSimple);
+        console.log(userSimple);
+
+    } catch (err) {
+        res.status(403).json({ message: 'Bad Login' });
+        return;
+    }
+
+
+});
+
+
+
+
+
+
+userRouter.get('/me2', async (req, res) => {
+  
+
+    const authHeader = req.get("Authorization");
+    console.log(authHeader);
+
+
+    const [type, session_token] = authHeader.split(" ");
+    console.log("tyep: " + type);
+    console.log("session_token: " + session_token);
+    res.end()
+    return;
+
 
     try {
         const userData = jwt.verify(session_token, process.env.JWT_KEY);
