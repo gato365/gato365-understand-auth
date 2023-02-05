@@ -5,6 +5,38 @@ const { User } = require('../models');
 
 const userRouter = Router();
 
+
+// Create a new user
+userRouter.post('/', async (req, res) => {
+
+    const { username, password } = req.body;
+
+
+
+    const user = await User.findOne({
+        where: {
+            username,
+        },
+    });
+
+
+    if (user) {
+        res.status(409).json({ message: 'Username already exists' });
+        return;
+    }
+
+
+
+
+    const newUser = await User.create({
+        username,
+        password,
+    });
+
+    // res.json(user);
+});
+
+
 userRouter.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -57,7 +89,7 @@ userRouter.post('/login', async (req, res) => {
 });
 
 userRouter.get('/me', async (req, res) => {
-    console.log(req.cookies);
+    // console.log(req.cookies);
 
     const { session_token } = req.cookies;
 
@@ -67,6 +99,10 @@ userRouter.get('/me', async (req, res) => {
         
         const user = await User.findByPk(userData.id);
         const userSimple = user.get({ plain: true });
+        delete userSimple.password;
+
+        res.json(userSimple);
+        console.log(userSimple);
 
     } catch (err) {
         res.status(403).json({ message: 'Bad Login' });
