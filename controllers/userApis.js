@@ -135,8 +135,13 @@ userRouter.get('/me2', async (req, res) => {
 
 
     const [type, session_token] = authHeader.split(" ");
-    console.log("tyep: " + type);
-    console.log("session_token: " + session_token);
+   
+
+
+    if(type !== "Bearer") {
+        res.status(403).json({ message: 'Bad Login' });
+    }
+
     res.end()
     return;
 
