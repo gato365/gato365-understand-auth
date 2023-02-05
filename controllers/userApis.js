@@ -34,13 +34,16 @@ userRouter.post('/', async (req, res) => {
 
     const newUser = await User.create({
         username,
-        password,
+        password: encryptedPassword,
     });
 
     res.status(200).json(
         {id: newUser.id,}
         );
 });
+
+
+
 
 
 userRouter.post('/login', async (req, res) => {
