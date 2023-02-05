@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
+const becrypt = require('bcrypt');
 
 
 const userRouter = Router();
@@ -28,12 +29,17 @@ userRouter.post('/', async (req, res) => {
 
 
 
+    const encryptedPassword = await becrypt.hash(password, 10);
+
+
     const newUser = await User.create({
         username,
         password,
     });
 
-    // res.json(user);
+    res.status(200).json(
+        {id: newUser.id,}
+        );
 });
 
 
